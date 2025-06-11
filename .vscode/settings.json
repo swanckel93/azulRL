@@ -1,0 +1,52 @@
+{
+    // Python formatting with Black
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length=88",
+        "--target-version=py38"
+    ],
+    // Format on save
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+    // Python-specific format on save
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    // Import sorting (isort integration)
+    "python.sortImports.args": [
+        "--profile=black",
+        "--line-length=88",
+        "--multi-line=3"
+    ],
+    // Type checking
+    "python.analysis.typeCheckingMode": "basic",
+    // Editor settings for better Python experience
+    "editor.rulers": [
+        88
+    ], // Visual guide for line length
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.trimAutoWhitespace": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    // Auto-save for convenience
+    "files.autoSave": "onFocusChange",
+    // Python interpreter settings
+    "python.defaultInterpreterPath": "./venv/bin/python", // Adjust path as needed
+    // IntelliSense and autocomplete
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.completeFunctionParens": true,
+    // Docstring format
+    "python.analysis.autoFormatStrings": true,
+    "autoDocstring.docstringFormat": "google",
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true // or "numpy", "sphinx"
+}
