@@ -246,3 +246,45 @@ class PlayerBoard:
 
     def has_complete_row(self) -> bool:
         return any(all(self.wall[row]) for row in range(5))
+
+    def count_complete_horizontal_lines(self) -> int:
+        """Count the number of complete horizontal lines (rows) on the wall"""
+        return sum(1 for row in range(5) if all(self.wall[row]))
+
+    def count_complete_vertical_lines(self) -> int:
+        """Count the number of complete vertical lines (columns) on the wall"""
+        return sum(
+            1 for col in range(5) if all(self.wall[row][col] for row in range(5))
+        )
+
+    def count_complete_color_sets(self) -> int:
+        """Count the number of complete color sets (all 5 tiles of one color)"""
+        color_counts = {
+            tile_type: 0 for tile_type in TileType if tile_type != TileType.FIRST_PLAYER
+        }
+
+        # Count tiles of each color on the wall
+        for row in range(5):
+            for col in range(5):
+                if self.wall[row][col]:
+                    tile_type = self.WALL_PATTERN[row][col]
+                    if tile_type in color_counts:
+                        color_counts[tile_type] += 1
+
+        # Count how many colors have all 5 tiles placed
+        return sum(1 for count in color_counts.values() if count == 5)
+
+    def calculate_final_score(self) -> int:
+        """Calculate the final score including bonus points"""
+        final_score = self.score  # Start with current score
+
+        # Bonus points for complete horizontal lines (2 points each)
+        final_score += self.count_complete_horizontal_lines() * 2
+
+        # Bonus points for complete vertical lines (7 points each)
+        final_score += self.count_complete_vertical_lines() * 7
+
+        # Bonus points for complete color sets (10 points each)
+        final_score += self.count_complete_color_sets() * 10
+
+        return max(0, final_score)  # Score cannot go below 0

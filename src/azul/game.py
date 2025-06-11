@@ -1,6 +1,6 @@
 from .components import *
 from .game_state import GameState
-from .data_model import GameStateType, Action, ActionType, TileType
+from .data_model import GameStateType, Action, ActionType, TileType, CompletionStatus
 
 
 class AzulGame:
@@ -141,7 +141,7 @@ class AzulGame:
 
         # Check for game end
         if any(player.has_complete_row() for player in self.game_state.players):
-            self.game_state.state = GameStateType.GAME_END
+            self._end_game()
         else:
             # Setup next round
             self.game_state.round_number += 1
@@ -154,6 +154,74 @@ class AzulGame:
                 random.shuffle(self.game_state.bag.tiles)
 
             self._setup_round()
+
+    def _end_game(self):
+        """End the game and determine the winner"""
+        self.game_state.state = GameStateType.GAME_END
+        self.game_state.completion = CompletionStatus.COMPLETED
+
+        # Calculate final scores (including bonus points)
+        final_scores = []
+        for player in self.game_state.players:
+            final_score = player.calculate_final_score()
+            player.score = final_score
+            final_scores.append(final_score)
+
+        # Determine winner
+        max_score = max(final_scores)
+        winners = [i for i, score in enumerate(final_scores) if score == max_score]
+
+        if len(winners) == 1:
+            # Single winner
+            self.game_state.winner = winners[0]
+        else:
+            # Tie-breaking: player with most complete horizontal lines wins
+            tie_breakers = []
+            for winner_idx in winners:
+                complete_lines = self.game_state.players[
+                    winner_idx
+                ].count_complete_horizontal_lines()
+                tie_breakers.append((winner_idx, complete_lines))
+
+            # Sort by number of complete lines (descending)
+            tie_breakers.sort(key=lambda x: x[1], reverse=True)
+
+            if tie_breakers[0][1] > tie_breakers[1][1]:
+                # Clear winner after tie-breaker
+                self.game_state.winner = tie_breakers[0][0]
+            else:
+                # Still tied - it's a draw
+                self.game_state.winner = -1
+
+    def abort_game(self):
+        """Abort the game (e.g., if a player disconnects)"""
+        self.game_state.state = GameStateType.GAME_END
+        self.game_state.completion = CompletionStatus.ABORTED
+        self.game_state.winner = -1
+
+    def is_game_over(self) -> bool:
+        """Check if the game is over"""
+        return self.game_state.state == GameStateType.GAME_END
+
+    def get_winner(self) -> int:
+        """Get the winner index (-1 for draw, -2 for aborted/not completed)"""
+        if self.game_state.completion == CompletionStatus.COMPLETED:
+            return self.game_state.winner
+        elif self.game_state.completion == CompletionStatus.ABORTED:
+            return -1  # No winner in aborted game
+        else:
+            return -2  # Game not yet completed
+
+    def get_game_result(self) -> dict:
+        """Get comprehensive game result information"""
+        return {
+            "completion_status": self.game_state.completion,
+            "winner": self.game_state.winner,
+            "final_scores": [player.score for player in self.game_state.players],
+            "rounds_played": self.game_state.round_number,
+            "is_draw": self.game_state.completion == CompletionStatus.COMPLETED
+            and self.game_state.winner == -1,
+        }
 
 
 def get_valid_actions(game_state: GameState) -> List[Action]:

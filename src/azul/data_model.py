@@ -22,6 +22,12 @@ class GameStateType(Enum):
     GAME_END = auto()
 
 
+class CompletionStatus(Enum):
+    NOT_COMPLETED = auto()
+    ABORTED = auto()
+    COMPLETED = auto()
+
+
 class ActionType(Enum):
     TAKE_FROM_FACTORY = auto()
     TAKE_FROM_CENTER = auto()
