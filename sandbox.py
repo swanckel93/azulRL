@@ -1,4 +1,4 @@
-from azul.tile import Tile, TileType
+from azul.components import Tile, TileType
 
 
 t = Tile(type=TileType.BLACK, tile_id=1)

@@ -32,10 +32,35 @@ extend-exclude = '''
 )/
 '''
 [tool.pytest.ini_options]
-testpaths = ["tests/unit", "tests/integration"]
+# Test discovery
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+# Markers
 markers = [
-    "unit: marks tests as unit tests (fast, isolated)",
-    "integration: marks tests as integration tests (slower, with dependencies)"
+    "unit: Unit tests - test individual components in isolation",
+    "integration: Integration tests - test component interactions",
+    "slow: Tests that take longer to run"
+]
+
+# Output configuration
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--strict-config",
+    "--disable-warnings"
+]
+
+# Minimum version
+minversion = "6.0"
+
+# Filter warnings
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
 ]
 
 [build-system]
