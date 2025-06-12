@@ -1,0 +1,35 @@
+.tile-placeholder {
+    /* Base styling */
+    /* flex: 1; */
+    aspect-ratio: 1;
+    display: flex;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+    background-color: #6b7280;
+
+    /* Modern shadow for depth */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+    /* Subtle border for definition */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+
+    /* Smooth transitions for interactions */
+    transition: all 0.2s ease;
+
+    /* Typography */
+    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+
+.tile-placeholders-container {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}

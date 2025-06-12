@@ -1,0 +1,76 @@
+.game-header {
+    background-color: #f9fafb;
+    border-bottom: 2px solid #242424;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    min-height: 80px;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.game-info h1 {
+    margin: 0;
+    color: #242424;
+    font-size: 24px;
+}
+
+.game-state, .round-info, .player-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.state-label, .round-label, .player-label {
+    font-weight: bold;
+    color: #242424;
+}
+
+.state-value, .round-value, .player-value {
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.first-player-token {
+    background-color: #eab308;
+    color: #242424;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.action-preview {
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    right: 20px;
+    background-color: #f0f8ff;
+    border: 2px solid #1e40af;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.action-preview h3 {
+    margin: 0 0 10px 0;
+    color: #242424;
+    font-size: 16px;
+}
+
+.action-preview span {
+    margin-right: 15px;
+    color: #1e40af;
+    font-weight: 600;
+}

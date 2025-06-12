@@ -1,28 +1,27 @@
-import {
-  Application,
-  extend,
-} from '@pixi/react';
-import {
-  Container,
-  Graphics,
-  Sprite,
-} from 'pixi.js';
-
-import { BunnySprite } from './BunnySprite'
-
-// extend tells @pixi/react what Pixi.js components are available
-extend({
-  Container,
-  Graphics,
-  Sprite,
-});
+import { Header } from "./components/Header";
+import { PlayerBoard } from "./components/PlayerBoard";
+import { BoardCenter } from "./components/BoardCenter";
+import FactoryPanel from "./components/FactoryPanel.tsx";
+import "./App.css";
 
 export default function App() {
   return (
-    // We'll wrap our components with an <Application> component to provide
-    // the Pixi.js Application context
-    <Application>
-      <BunnySprite />
-    </Application>
-  );
+    <div className="app">
+      <Header />
+      
+      <div className="game-layout">
+        <div className="left-section">
+          <FactoryPanel />
+          <BoardCenter />
+        </div>
+        
+        <div className="right-section">
+          <div className="player-boards">
+            <PlayerBoard playerIndex={0} />
+            <PlayerBoard playerIndex={1} />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
