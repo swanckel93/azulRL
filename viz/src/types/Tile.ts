@@ -4,9 +4,7 @@ export enum TileType {
     RED = 'red',
     BLACK = 'black',
     WHITE = 'white',
-}
-export enum SpecialTileType {
-    THE_ONE = "white"
+    FIRST_PLAYER = 'first_player',
 }
 
 export interface Tile {

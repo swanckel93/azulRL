@@ -1,69 +1,75 @@
-/* MyComponent.css */
-
+/* Factory Card Component */
 .factory-card {
-    /* Base styling */
-    border-radius: 8px;
-    width: 100%;
-    height: 80px;
-    /* Modern shadow for depth */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-
-    /* Subtle border for definition */
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 10px;
-    /* Smooth transitions for interactions */
-    transition: all 0.3s ease;
-
-    /* Typography */
-    color: #333;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    margin-bottom: 15px;
-    
-    /* Fixed size to prevent layout shifts */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #CBC3A5;
-    overflow: hidden;
+  background: linear-gradient(135deg, #CBC3A5 0%, #BE9775 100%);
+  border: 2px solid #242424;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  
+  /* Fixed dimensions to prevent layout shifts */
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 
+.factory-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Tile Wrapper for Selection States */
 .tile-wrapper {
-    /* Base styles for the wrapper */
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  padding: 2px;
 }
 
 .tile-wrapper.hovered {
-    /* Lift effect */
-    transform: translateY(-2px) scale(1.05);
-
-    /* Enhanced shadow on hover */
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  background-color: rgba(234, 179, 8, 0.2);
+  transform: scale(1.05);
 }
 
 .tile-wrapper.selected {
-    /* Selected tile styling */
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-    border: 2px solid #ffcc00;
-    /* Golden border for selection */
+  background-color: rgba(234, 179, 8, 0.4);
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px #eab308;
 }
 
-/* Optional: If you want different styling when both selected AND hovered */
-.tile-wrapper.selected.hovered {
-    transform: translateY(-3px) scale(1.08);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-    border: 2px solid #ff9900;
-    /* Different color when hovering selected tile */
+/* Factory Panel Container */
+.factory-panel {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border: 2px solid #242424;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.factory-panel h2 {
+  margin: 0 0 20px 0;
+  color: #242424;
+  font-size: 26px;
+  font-weight: bold;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  border: 2px solid rgba(36, 36, 36, 0.2);
+}
 
-
-
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .factory-card {
-        padding: 20px;
-        border-radius: 12px;
-    }
+/* Responsive Factory Cards */
+@media (max-width: 800px) {
+  .factory-card {
+    height: 80px;
+    padding: 12px;
+  }
 }

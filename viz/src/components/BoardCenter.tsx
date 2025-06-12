@@ -15,6 +15,10 @@ export function BoardCenter() {
     }, {} as Record<TileType, number>);
 
     const handleTileClick = (tileType: TileType) => {
+        // First player token is not selectable
+        if (tileType === TileType.FIRST_PLAYER) {
+            return;
+        }
         selectTileFromCenter(tileType);
     };
 
@@ -29,7 +33,7 @@ export function BoardCenter() {
                             partialAction.tileType === tileType && partialAction.factoryId === -1 
                                 ? 'selected' 
                                 : ''
-                        }`}
+                        } ${tileType === TileType.FIRST_PLAYER ? 'first-player-token' : ''}`}
                         onClick={() => handleTileClick(tileType as TileType)}
                     >
                         <TileComponent type={tileType as TileType} />

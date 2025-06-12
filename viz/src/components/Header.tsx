@@ -39,29 +39,34 @@ export function Header() {
                     <span className="player-label">Current Player:</span>
                     <span className="player-value">Player {gameState.current_player + 1}</span>
                 </div>
+                <div className="bag-info">
+                    <span className="bag-icon">🎒</span>
+                    <span className="bag-label">Bag:</span>
+                    <span className="bag-value">{gameState.bag.tiles.length}</span>
+                </div>
+                <div className="discard-info">
+                    <span className="discard-icon">🗑️</span>
+                    <span className="discard-label">Discard:</span>
+                    <span className="discard-value">{gameState.discard_pile.tiles.length}</span>
+                </div>
                 {gameState.first_player_token_taken && (
                     <div className="first-player-token">
                         <span>🎯 First Player Token Taken</span>
                     </div>
                 )}
+                {Object.keys(partialAction).length > 0 && (
+                    <div className="action-preview">
+                        <div className="action-preview-title">Current Action</div>
+                        <div className="action-preview-description">
+                            {[
+                                partialAction.tileType && `Tile: ${partialAction.tileType}`,
+                                partialAction.factoryId !== undefined && `From: ${partialAction.factoryId === -1 ? 'Center' : `Factory ${partialAction.factoryId + 1}`}`,
+                                partialAction.patternLine !== undefined && `To: Pattern Line ${partialAction.patternLine + 1}`
+                            ].filter(Boolean).join(' | ')}
+                        </div>
+                    </div>
+                )}
             </div>
-            
-            {Object.keys(partialAction).length > 0 && (
-                <div className="action-preview">
-                    <h3>Current Action:</h3>
-                    {partialAction.tileType && (
-                        <span>Tile: {partialAction.tileType}</span>
-                    )}
-                    {partialAction.factoryId !== undefined && (
-                        <span>
-                            From: {partialAction.factoryId === -1 ? 'Center' : `Factory ${partialAction.factoryId + 1}`}
-                        </span>
-                    )}
-                    {partialAction.patternLine !== undefined && (
-                        <span>To: Pattern Line {partialAction.patternLine + 1}</span>
-                    )}
-                </div>
-            )}
         </header>
     );
 }

@@ -23,7 +23,7 @@ interface GameStore {
 
 const useStore = create<GameStore>((set, get) => ({
     gameState: {
-        state: GameStateType.SETUP,
+        state: GameStateType.PLAYER_TURN,
         current_player: 0,
         round_number: 1,
         bag: { tiles: [] },
@@ -48,7 +48,13 @@ const useStore = create<GameStore>((set, get) => ({
             { tiles: [] } as Factory,
             { tiles: [] } as Factory
         ],
-        center: { tiles: [] },
+        center: { 
+            tiles: [
+                { type: TileType.FIRST_PLAYER },
+                { type: TileType.BLUE },
+                { type: TileType.RED }
+            ] 
+        },
         discard_pile: { tiles: [] },
         players: [
             {

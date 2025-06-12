@@ -30,6 +30,24 @@ export function PlayerBoard({ playerIndex }: PlayerBoardProps) {
         [TileType.YELLOW, TileType.RED, TileType.BLACK, TileType.WHITE, TileType.BLUE]
     ];
 
+    // Convert TileType to TilePlaceholderType
+    const tileTypeToPlaceholderType = (tileType: TileType): TilePlaceholderType => {
+        switch (tileType) {
+            case TileType.BLUE:
+                return TilePlaceholderType.BLUE;
+            case TileType.YELLOW:
+                return TilePlaceholderType.YELLOW;
+            case TileType.RED:
+                return TilePlaceholderType.RED;
+            case TileType.BLACK:
+                return TilePlaceholderType.BLACK;
+            case TileType.WHITE:
+                return TilePlaceholderType.WHITE;
+            default:
+                return TilePlaceholderType.GENERIC;
+        }
+    };
+
     const handlePatternLineClick = (lineIndex: number) => {
         // Only allow pattern line selection for the current player
         if (isCurrentPlayer) {
@@ -47,8 +65,12 @@ export function PlayerBoard({ playerIndex }: PlayerBoardProps) {
             </div>
             
             <div className="board-main">
-                <div className="pattern-lines-section">
-                    <h3>Pattern Lines</h3>
+                <div className="board-headers">
+                    <h3 className="pattern-lines-header">Pattern Lines</h3>
+                    <h3 className="wall-header">Wall</h3>
+                </div>
+                
+                <div className="pattern-lines-and-wall-section">
                     {playerState.patternLines.map((line, lineIndex) => (
                         <div key={`pattern-line-${lineIndex}`} className="board-row">
                             <div
@@ -78,12 +100,40 @@ export function PlayerBoard({ playerIndex }: PlayerBoardProps) {
                             <div className="wall-row">
                                 {WALL_PATTERN[lineIndex].map((tileType, colIndex) => {
                                     const isPlaced = playerState.wall[lineIndex]?.[colIndex];
+                                    
+                                    // String-based gradient mapping (matching TileComponent.css)
+                                    const getGradientByString = (typeString: string): string => {
+                                        switch (typeString) {
+                                            case 'blue': return 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)';
+                                            case 'yellow': return 'linear-gradient(135deg, #eab308 0%, #fbbf24 100%)';
+                                            case 'red': return 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)';
+                                            case 'black': return 'linear-gradient(135deg, #1f2937 0%, #374151 100%)';
+                                            case 'white': return 'linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%)';
+                                            default: return 'linear-gradient(135deg, #ff0000 0%, #ff4444 100%)';
+                                        }
+                                    };
+                                    
                                     return (
-                                        <div key={`wall-tile-${colIndex}`} className="wall-tile">
+                                        <div key={`wall-tile-${colIndex}`} style={{ 
+                                            width: '54px',
+                                            height: '54px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}>
                                             {isPlaced ? (
                                                 <TileComponent type={tileType} />
                                             ) : (
-                                                <div className="wall-empty" />
+                                                <div 
+                                                    style={{ 
+                                                        background: getGradientByString(tileType),
+                                                        width: '50px',
+                                                        height: '50px',
+                                                        border: '2px dashed #9ca3af',
+                                                        borderRadius: '4px',
+                                                        opacity: 0.6
+                                                    }}
+                                                />
                                             )}
                                         </div>
                                     );

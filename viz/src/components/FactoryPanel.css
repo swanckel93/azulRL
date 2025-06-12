@@ -1,11 +1,1 @@
-.factory-panel {
-    display: flex !important;
-    flex-direction: column !important;
-    /* justify-content: space-evenly; */
-    width: 30%;
-    /* height: 1em; */
-    gap: 0.1em;
-    padding: 0.3 em;
-    border: 2px solid rgba(0, 0, 0, 1);
-    /* Optional: adds consistent space between cards */
-}
+/* Factory Panel styling is now in FactoryCard.css */

@@ -1,45 +1,74 @@
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #242424;
+  color: #f9fafb;
+}
+
+/* Main App Container */
 .app {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    font-family: Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Game Layout - Main Content Area */
 .game-layout {
-    display: flex;
-    flex: 1;
-    gap: 30px;
-    padding: 30px;
-    max-width: 1600px;
-    margin: 0 auto;
-    min-height: calc(100vh - 120px);
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 24px;
+  padding: 24px;
+  flex: 1;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
 }
 
+/* Left Section - Factories and Center */
 .left-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
+/* Right Section - Player Boards */
 .right-section {
-    flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .player-boards {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
 }
 
-/* Responsive design */
+/* Responsive Design */
 @media (max-width: 1200px) {
-    .game-layout {
-        flex-direction: column;
-    }
-    
-    .player-boards {
-        flex-direction: row;
-        justify-content: space-around;
-    }
+  .game-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .player-boards {
+    flex-direction: row;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 800px) {
+  .game-layout {
+    padding: 16px;
+  }
+  
+  .player-boards {
+    flex-direction: column;
+  }
 }
