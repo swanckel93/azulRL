@@ -22,7 +22,7 @@ export default function FactoryCard(props: FactoryCard) {
 
     const factory = getFactoryByIndex(props.index)
 
-    const n_total_elements = 5
+    const n_total_elements = 4
     const tiles: Tile[] = factory?.tiles ? [...factory.tiles] : []
     const placeholders_needed = n_total_elements - tiles.length
 

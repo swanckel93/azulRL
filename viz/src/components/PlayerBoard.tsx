@@ -71,7 +71,7 @@ export function PlayerBoard({ playerIndex }: PlayerBoardProps) {
                 </div>
                 
                 <div className="pattern-lines-and-wall-section">
-                    {playerState.patternLines.map((line, lineIndex) => (
+                    {(playerState.patternLines || []).map((line, lineIndex) => (
                         <div key={`pattern-line-${lineIndex}`} className="board-row">
                             <div
                                 className={`pattern-line ${partialAction.patternLine === lineIndex && isCurrentPlayer ? 'selected' : ''} ${!isCurrentPlayer ? 'disabled' : ''}`}
@@ -83,8 +83,8 @@ export function PlayerBoard({ playerIndex }: PlayerBoardProps) {
                                     const slotIndex = lineIndex - i;
                                     return (
                                         <div key={`placeholder-${i}`} className="pattern-line-slot">
-                                            {slotIndex < line.tiles.length ? (
-                                                <TileComponent type={line.tiles[slotIndex].type} />
+                                            {slotIndex < (line.tiles || []).length ? (
+                                                <TileComponent type={line.tiles?.[slotIndex]?.type} />
                                             ) : (
                                                 <TilePlaceholderComponent
                                                     id={i}
@@ -147,13 +147,20 @@ export function PlayerBoard({ playerIndex }: PlayerBoardProps) {
             <div className="board-section floor-line">
                 <h3>Floor Line</h3>
                 <div className="floor-tiles">
-                    {playerState.floor.map((tile, index) => (
-                        <TileComponent key={`floor-tile-${index}`} type={tile.type} />
-                    ))}
-                    {/* Show empty floor line slots */}
-                    {Array.from({ length: Math.max(0, 7 - playerState.floor.length) }).map((_, index) => (
-                        <div key={`floor-empty-${index}`} className="floor-empty-slot" />
-                    ))}
+                    {Array.from({ length: 7 }).map((_, index) => {
+                        const penalties = [-1, -1, -2, -2, -2, -3, -3];
+                        const tile = (playerState.floor || [])[index];
+                        return (
+                            <div key={`floor-slot-${index}`} className="floor-slot">
+                                {tile ? (
+                                    <TileComponent type={tile.type} />
+                                ) : (
+                                    <div className="floor-empty-slot" />
+                                )}
+                                <div className="floor-penalty">{penalties[index]}</div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>

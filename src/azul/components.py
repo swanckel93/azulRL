@@ -19,8 +19,7 @@ class Tile:
 
 @dataclass
 class Container:
-    def __init__(self):
-        self.tiles: List[Tile] = []
+    tiles: List[Tile] = field(default_factory=list)
 
     def add_tile(self, tile: Tile) -> None:
         self.tiles.append(tile)
@@ -57,7 +56,6 @@ class Container:
 @dataclass
 class Bag(Container):
     def __post_init__(self):
-        super().__init__()
         self._initialize_bag()
 
     def _initialize_bag(self):
@@ -81,10 +79,7 @@ class Bag(Container):
 
 @dataclass
 class Factory(Container):
-    id: int
-
-    def __post_init__(self):
-        super().__init__()
+    id: int = 0
 
     def fill_from_bag(self, bag: Bag) -> None:
         if bag.is_empty():
@@ -132,7 +127,7 @@ class PatternLine:
 
 @dataclass
 class PlayerBoard:
-    pattern_lines: List[PatternLine] = field(
+    patternLines: List[PatternLine] = field(
         default_factory=lambda: [PatternLine(i + 1) for i in range(5)]
     )
     wall: List[List[bool]] = field(
@@ -156,7 +151,7 @@ class PlayerBoard:
         if line_idx < 0 or line_idx >= 5:
             return False
 
-        pattern_line = self.pattern_lines[line_idx]
+        pattern_line = self.patternLines[line_idx]
         if not pattern_line.can_add_tile(tile_type):
             return False
 
@@ -168,7 +163,7 @@ class PlayerBoard:
         if line_idx == -1:  # Floor line
             self.floor.extend(tiles)
         else:
-            overflow = self.pattern_lines[line_idx].add_tiles(tiles)
+            overflow = self.patternLines[line_idx].add_tiles(tiles)
             if overflow > 0:
                 self.floor.extend(tiles[-overflow:])
 
@@ -176,7 +171,7 @@ class PlayerBoard:
         # Returns tiles to be discarded
         discarded = []
 
-        for i, pattern_line in enumerate(self.pattern_lines):
+        for i, pattern_line in enumerate(self.patternLines):
             if pattern_line.is_full():
                 tile_type = pattern_line.get_tile_type()
                 if tile_type is None:

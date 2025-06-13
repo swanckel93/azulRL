@@ -38,7 +38,8 @@
 .round-info, 
 .player-info,
 .bag-info,
-.discard-info {
+.discard-info,
+.session-info {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -55,7 +56,8 @@
 .round-label, 
 .player-label,
 .bag-label,
-.discard-label {
+.discard-label,
+.session-label {
   font-weight: 600;
   color: #242424;
   font-size: 18px;
@@ -66,7 +68,8 @@
 .round-value, 
 .player-value,
 .bag-value,
-.discard-value {
+.discard-value,
+.session-value {
   color: #1e40af;
   font-weight: 700;
   font-size: 18px;
@@ -131,6 +134,97 @@
   word-wrap: break-word;
 }
 
+/* Game Controls */
+.game-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  height: 74px;
+  flex-wrap: wrap;
+}
+
+.control-button {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: 2px solid #1e40af;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.control-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.control-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.control-button:disabled {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  border-color: #6b7280;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.control-button.abort-game {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  border-color: #b91c1c;
+}
+
+.control-button.abort-game:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+}
+
+.control-button.execute-action {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  border-color: #065f46;
+}
+
+.control-button.execute-action:hover:not(:disabled) {
+  background: linear-gradient(135deg, #047857 0%, #064e3b 100%);
+}
+
+/* Error Message */
+.error-message {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 2px solid #dc2626;
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 74px;
+  box-sizing: border-box;
+  min-width: 200px;
+}
+
+.error-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.error-text {
+  color: #dc2626;
+  font-weight: 600;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.3;
+}
+
 /* Responsive Header */
 @media (max-width: 800px) {
   .game-header {
@@ -152,12 +246,28 @@
   .round-info, 
   .player-info,
   .bag-info,
-  .discard-info {
+  .discard-info,
+  .session-info {
     min-width: auto;
     justify-content: center;
   }
   
   .action-preview {
     min-width: auto;
+  }
+  
+  .game-controls {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .control-button {
+    min-width: auto;
+    flex: 1;
+  }
+  
+  .error-message {
+    min-width: auto;
+    justify-content: center;
   }
 }

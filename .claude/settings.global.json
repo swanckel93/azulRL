@@ -1,0 +1,30 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(poetry lock:*)",
+            "Bash(mkdir:*)",
+            "Bash(rm:*)",
+            "Bash(python -m pytest tests/unit/test_game_json_serialization.py::TestGameState::test_from_json_basic_functionality -v)",
+            "Bash(python -m pytest tests/unit/test_game_json_serialization.py::TestGameState -v)",
+            "Bash(python -m pytest tests/unit/test_game_json_serialization.py -v)",
+            "Bash(python -m pytest src/backend/tests/ -v)",
+            "Bash(python -m pytest --collect-only)",
+            "Bash(poetry install:*)",
+            "Bash(python -m pytest tests/ -v)",
+            "Bash(cp:*)",
+            "Bash(python -m pytest tests/backend/ -v)",
+            "Bash(python -m pytest tests/backend/ tests/unit/test_models.py -v)",
+            "Bash(npm install:*)",
+            "Bash(npm run dev:*)",
+            "Bash(poetry run:*)",
+            "Bash(find:*)",
+            "Bash(grep:*)",
+            "Bash(pkill:*)",
+            "Bash(ss:*)",
+            "Bash(sudo ufw:*)",
+            "Bash(ip route:*)",
+            "Bash(cat:*)"
+        ],
+        "deny": []
+    }
+}

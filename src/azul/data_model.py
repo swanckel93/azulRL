@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass, field
 from collections import defaultdict
@@ -15,22 +15,23 @@ class TileType(Enum):
 
 
 class GameStateType(Enum):
-    SETUP = auto()
-    FACTORY_FILLING = auto()
-    PLAYER_TURN = auto()
-    ROUND_END = auto()
-    GAME_END = auto()
+    SETUP = "SETUP"
+    FACTORY_FILLING = "FACTORY_FILLING"
+    PLAYER_TURN = "PLAYER_TURN"
+    ROUND_END = "ROUND_END"
+    GAME_END = "GAME_END"
 
 
 class CompletionStatus(Enum):
-    NOT_COMPLETED = auto()
-    ABORTED = auto()
-    COMPLETED = auto()
+    NOT_COMPLETED = "NOT_COMPLETED"
+    ABORTED = "ABORTED"
+    COMPLETED = "COMPLETED"
 
 
 class ActionType(Enum):
-    TAKE_FROM_FACTORY = auto()
-    TAKE_FROM_CENTER = auto()
+    TAKE_FROM_FACTORY = "TAKE_FROM_FACTORY"
+    TAKE_FROM_CENTER = "TAKE_FROM_CENTER"
+    ABORT_GAME = "ABORT_GAME"
 
 
 @dataclass

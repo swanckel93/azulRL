@@ -10,7 +10,7 @@ class AzulGame:
 
         # Adjust number of factories based on player count
         factory_count = {2: 5, 3: 7, 4: 9}[num_players]
-        self.game_state.factories = [Factory(i) for i in range(factory_count)]
+        self.game_state.factories = [Factory(id=i) for i in range(factory_count)]
 
         self._setup_round()
 
@@ -97,7 +97,7 @@ class AzulGame:
             self.game_state.center.remove_tile(TileType.FIRST_PLAYER)
             player.floor.append(Tile(TileType.FIRST_PLAYER))
             self.game_state.first_player_token_taken = True
-            self.game_state.current_player = 0  # This player goes first next round
+            self.game_state.next_first_player = self.game_state.current_player
 
         # Add tiles to player board
         player.add_tiles_to_pattern_line(pattern_line, taken_tiles)
@@ -145,6 +145,7 @@ class AzulGame:
         else:
             # Setup next round
             self.game_state.round_number += 1
+            self.game_state.current_player = self.game_state.next_first_player
             self.game_state.first_player_token_taken = False
 
             # Refill bag if needed

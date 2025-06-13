@@ -1,6 +1,9 @@
 import json
 from dataclasses import dataclass, field, asdict
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .data_model import Action
 
 from .data_model import GameStateType, CompletionStatus
 from .components import Bag, Container, Factory, PlayerBoard
@@ -17,12 +20,14 @@ class GameState:
     discard_pile: Container = field(default_factory=Container)
     players: List[PlayerBoard] = field(default_factory=list)
     first_player_token_taken: bool = False
+    next_first_player: int = 0
     completion: CompletionStatus = CompletionStatus.NOT_COMPLETED
     winner: int = -1
+    valid_actions: List['Action'] = field(default_factory=list)
 
     def __post_init__(self):
         if not self.factories:
-            self.factories = [Factory(i) for i in range(5)]  # 5 factories for 2 players
+            self.factories = [Factory(id=i) for i in range(5)]  # 5 factories for 2 players
         if not self.players:
             self.players = [PlayerBoard() for _ in range(2)]
 
@@ -51,6 +56,21 @@ class GameState:
         # Convert enum to its value
         if hasattr(self.state, "value"):
             game_dict["state"] = self.state.value
+
+        # Convert valid actions to frontend format
+        from .data_model import Action
+        if self.valid_actions:
+            game_dict["validActions"] = []
+            for action in self.valid_actions:
+                action_dict = {
+                    "type": action.type.name,
+                    "factory_id": action.factory_id,
+                    "tile_type": action.tile_type.value.upper() if action.tile_type else None,
+                    "pattern_line": action.pattern_line
+                }
+                game_dict["validActions"].append(action_dict)
+        else:
+            game_dict["validActions"] = []
 
         return game_dict
 
@@ -106,6 +126,9 @@ class GameState:
         Returns:
             GameState instance
         """
+        # Make a copy to avoid modifying the original
+        data = data.copy()
+        
         # Convert state back to enum if needed
         if "state" in data:
             if isinstance(data["state"], str):
@@ -117,6 +140,30 @@ class GameState:
             elif isinstance(data["state"], int):
                 # Handle integer representation of enum
                 data["state"] = GameStateType(data["state"])
+
+        # Handle validActions -> valid_actions conversion
+        if "validActions" in data:
+            # Convert frontend validActions back to backend valid_actions
+            from .data_model import Action, ActionType, TileType
+            valid_actions = []
+            for action_dict in data["validActions"]:
+                if isinstance(action_dict, dict):
+                    # Convert frontend format back to Action objects
+                    action_type = ActionType[action_dict["type"]] if "type" in action_dict else None
+                    tile_type = None
+                    if action_dict.get("tile_type"):
+                        tile_type = TileType(action_dict["tile_type"].lower())
+                    
+                    action = Action(
+                        type=action_type,
+                        factory_id=action_dict.get("factory_id"),
+                        tile_type=tile_type,
+                        pattern_line=action_dict.get("pattern_line")
+                    )
+                    valid_actions.append(action)
+            
+            data["valid_actions"] = valid_actions
+            del data["validActions"]  # Remove the frontend key
 
         # Handle reconstruction of nested objects
         # You'll need to implement similar logic for Bag, Factory, Container, PlayerBoard

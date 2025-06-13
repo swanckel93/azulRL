@@ -1,10 +1,12 @@
 /* Board Center Component */
 .board-center {
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-  border: 2px solid #242424;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #CBC3A5 0%, #BE9775 100%);
+  border: 3px solid #242424;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .board-center h3 {
