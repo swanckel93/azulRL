@@ -14,6 +14,7 @@ interface GameStore {
     gameState: GameState,
     partialAction: PartialAction,
     sessionId: string | null,
+    playerId: string | null,
     isLoading: boolean,
     error: string | null,
     setGameState: (gameState: GameState) => void,
@@ -23,7 +24,11 @@ interface GameStore {
     selectPatternLine: (patternLine: number) => void,
     clearAction: () => void,
     isActionComplete: () => boolean,
-    startNewGame: (numPlayers?: number) => Promise<string>,
+    isActionValid: (tileType: TileType, factoryId: number, patternLine: number) => boolean,
+    setError: (error: string | null) => void,
+    startNewGame: (numPlayers?: number, gameMode?: string, playerName?: string) => Promise<string>,
+    joinSession: (sessionId: string, playerName?: string) => Promise<void>,
+    leaveSession: () => Promise<void>,
     abortGame: () => Promise<void>,
     executeAction: () => Promise<void>,
     restoreSession: (sessionId: string) => Promise<void>,
@@ -50,6 +55,7 @@ const useStore = create<GameStore>((set, get) => ({
     } as GameState,
     partialAction: {},
     sessionId: null,
+    playerId: null,
     isLoading: false,
     error: null,
     setGameState: (gameState) => set({ gameState }),
@@ -94,7 +100,8 @@ const useStore = create<GameStore>((set, get) => ({
             partialAction: { ...state.partialAction, patternLine }
         }))
     },
-    clearAction: () => set({ partialAction: {} }),
+    clearAction: () => set({ partialAction: {}, error: null }),
+    setError: (error: string | null) => set({ error }),
     isActionComplete: () => {
         const { partialAction } = get()
         return partialAction && 
@@ -103,17 +110,47 @@ const useStore = create<GameStore>((set, get) => ({
             partialAction.patternLine !== undefined
     },
     
+    isActionValid: (tileType: TileType, factoryId: number, patternLine: number) => {
+        const { gameState } = get()
+        if (!gameState.validActions) return false
+        
+        const actionType = factoryId === -1 ? 'TAKE_FROM_CENTER' : 'TAKE_FROM_FACTORY'
+        
+        console.log('Checking action validity:', { tileType, factoryId, patternLine, actionType })
+        console.log('Available validActions:', gameState.validActions)
+        
+        const isValid = gameState.validActions.some(action => 
+            action.type === actionType &&
+            action.tile_type === tileType.toUpperCase() &&
+            (factoryId === -1 ? true : action.factory_id === factoryId) &&
+            action.pattern_line === patternLine
+        )
+        
+        console.log('Action is valid:', isValid)
+        return isValid
+    },
+    
     // Backend API functions
-    startNewGame: async (numPlayers = 2) => {
+    startNewGame: async (numPlayers = 2, gameMode = 'SELFPLAY', playerName?: string) => {
         set({ isLoading: true, error: null })
         try {
-            const response = await axios.post(`${API_BASE_URL}/sessions`, { num_players: numPlayers })
-            const { session_id, game_state } = response.data
+            const requestBody: any = { 
+                num_players: numPlayers,
+                game_mode: gameMode
+            }
             
-            console.log('Received response:', { session_id, game_state })
+            if (playerName) {
+                requestBody.player_name = playerName
+            }
+            
+            const response = await axios.post(`${API_BASE_URL}/sessions`, requestBody)
+            const { session_id, game_state, player_id } = response.data
+            
+            console.log('Received response:', { session_id, game_state, player_id })
             
             set({ 
                 sessionId: session_id,
+                playerId: player_id || null,
                 gameState: game_state,
                 partialAction: {},
                 isLoading: false,
@@ -129,6 +166,76 @@ const useStore = create<GameStore>((set, get) => ({
             set({ isLoading: false, error: errorMessage })
             console.error('Failed to start new game:', error)
             throw error
+        }
+    },
+
+    joinSession: async (sessionId: string, playerName?: string) => {
+        set({ isLoading: true, error: null })
+        try {
+            const requestBody: any = {}
+            if (playerName) {
+                requestBody.player_name = playerName
+            }
+            
+            const response = await axios.post(`${API_BASE_URL}/sessions/${sessionId}/join`, requestBody)
+            const { player_id, player_index, game_state } = response.data
+            
+            set({ 
+                sessionId: sessionId,
+                playerId: player_id,
+                gameState: game_state,
+                partialAction: {},
+                isLoading: false,
+                error: null
+            })
+            
+            console.log(`Joined session ${sessionId} as player ${player_index}`)
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to join session'
+            set({ isLoading: false, error: errorMessage })
+            console.error('Failed to join session:', error)
+            throw error
+        }
+    },
+
+    leaveSession: async () => {
+        const { sessionId, playerId } = get()
+        if (!sessionId || !playerId) {
+            set({ error: 'No active session to leave' })
+            return
+        }
+
+        set({ isLoading: true, error: null })
+        try {
+            await axios.post(`${API_BASE_URL}/sessions/${sessionId}/leave/${playerId}`)
+            
+            set({ 
+                sessionId: null,
+                playerId: null,
+                gameState: {
+                    state: GameStateType.GAME_END,
+                    current_player: 0,
+                    round_number: 1,
+                    bag: { tiles: [] },
+                    factories: [],
+                    center: { tiles: [] },
+                    discard_pile: { tiles: [] },
+                    players: [],
+                    first_player_token_taken: false,
+                    completion: CompletionStatus.NOT_COMPLETED,
+                    winner: -1,
+                    validActions: []
+                } as GameState,
+                partialAction: {},
+                isLoading: false,
+                error: null
+            })
+            
+            console.log('Left session successfully')
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to leave session'
+            set({ isLoading: false, error: errorMessage })
+            console.error('Failed to leave session:', error)
         }
     },
 
@@ -173,7 +280,7 @@ const useStore = create<GameStore>((set, get) => ({
     },
 
     executeAction: async () => {
-        const { sessionId, partialAction, isActionComplete } = get()
+        const { sessionId, partialAction, isActionComplete, isActionValid } = get()
         
         if (!sessionId) {
             set({ error: 'No active game session' })
@@ -182,6 +289,12 @@ const useStore = create<GameStore>((set, get) => ({
 
         if (!isActionComplete()) {
             set({ error: 'Action is not complete' })
+            return
+        }
+
+        // Validate action against validActions before sending
+        if (!isActionValid(partialAction.tileType!, partialAction.factoryId!, partialAction.patternLine!)) {
+            set({ error: 'Invalid action - not allowed by game rules' })
             return
         }
 

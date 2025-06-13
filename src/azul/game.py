@@ -124,11 +124,11 @@ class AzulGame:
     def _end_round(self):
         # Move completed pattern lines to wall and score
         for player in self.game_state.players:
-            discarded = player.move_completed_lines_to_wall()
+            discarded, newly_placed = player.move_completed_lines_to_wall()
             self.game_state.discard_pile.add_tiles(discarded)
 
-            # Calculate score
-            round_score = player.calculate_round_score()
+            # Calculate score for only newly placed tiles
+            round_score = player.calculate_round_score(newly_placed)
             player.score = max(0, player.score + round_score)
 
             # Clear floor

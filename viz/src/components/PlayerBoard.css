@@ -179,7 +179,7 @@
   border: 1px solid rgba(36, 36, 36, 0.2);
 }
 
-.floor-line h3 {
+.floor-line-header {
   margin: 0 0 16px 0;
   text-align: center;
   color: #242424;
@@ -190,6 +190,23 @@
   background-color: rgba(255, 255, 255, 0.3);
   border-radius: 8px;
   border: 2px solid rgba(36, 36, 36, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.floor-line-header:hover:not(.disabled) {
+  border-color: #6b7280;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.floor-line-header.selected {
+  border-color: #1e40af;
+  background-color: rgba(30, 64, 175, 0.2);
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.3);
+}
+
+.floor-line-header.disabled {
+  cursor: not-allowed;
 }
 
 .floor-tiles {

@@ -2,6 +2,7 @@ from enum import Enum
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass, field
 from collections import defaultdict
+from uuid import UUID
 import random
 
 
@@ -32,6 +33,26 @@ class ActionType(Enum):
     TAKE_FROM_FACTORY = "TAKE_FROM_FACTORY"
     TAKE_FROM_CENTER = "TAKE_FROM_CENTER"
     ABORT_GAME = "ABORT_GAME"
+
+
+class GameMode(Enum):
+    SELFPLAY = "SELFPLAY"
+    PVP = "PVP"
+    PVAI = "PVAI"
+
+
+class PlayerStatus(Enum):
+    CONNECTED = "CONNECTED"
+    DISCONNECTED = "DISCONNECTED"
+    LEFT = "LEFT"
+
+
+@dataclass
+class Player:
+    id: UUID
+    name: Optional[str] = None
+    status: PlayerStatus = PlayerStatus.CONNECTED
+    player_index: Optional[int] = None  # 0, 1, 2, 3 - which player board they control
 
 
 @dataclass

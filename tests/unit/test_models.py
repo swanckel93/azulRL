@@ -391,7 +391,7 @@ class TestPlayerBoard:
         # Fill first pattern line
         board.pattern_lines[0].tiles = [Tile(TileType.BLUE)]
 
-        discarded = board.move_completed_lines_to_wall()
+        discarded, newly_placed = board.move_completed_lines_to_wall()
 
         # Wall should have tile placed
         assert board.wall[0][0]  # Blue tile goes to (0,0)
@@ -399,12 +399,15 @@ class TestPlayerBoard:
         assert board.pattern_lines[0].is_empty()
         # No tiles should be discarded (only 1 tile in line)
         assert len(discarded) == 0
+        # One position should be newly placed
+        assert len(newly_placed) == 1
+        assert newly_placed[0] == (0, 0)
 
     def test_move_completed_lines_to_wall_multiple_tiles(self, board: PlayerBoard):
         # Fill second pattern line (capacity 2) with 2 tiles
         board.pattern_lines[1].tiles = [Tile(TileType.WHITE), Tile(TileType.WHITE)]
 
-        discarded = board.move_completed_lines_to_wall()
+        discarded, newly_placed = board.move_completed_lines_to_wall()
 
         # Wall should have tile placed at correct position for white in row 1
         assert board.wall[1][0]  # White tile goes to (1,0) in row 1
@@ -413,6 +416,9 @@ class TestPlayerBoard:
         # One tile should be discarded
         assert len(discarded) == 1
         assert discarded[0].type == TileType.WHITE
+        # One position should be newly placed
+        assert len(newly_placed) == 1
+        assert newly_placed[0] == (1, 0)
 
     def test_move_completed_lines_multiple_lines(self, board: PlayerBoard):
         # Fill multiple pattern lines
@@ -423,24 +429,29 @@ class TestPlayerBoard:
             Tile(TileType.BLUE),
         ]
 
-        discarded = board.move_completed_lines_to_wall()
+        discarded, newly_placed = board.move_completed_lines_to_wall()
 
         # Both lines should be moved to wall
         assert board.wall[0][0]  # Blue in row 0
         assert board.wall[2][2]  # Blue in row 2
         # 2 tiles should be discarded from the 3-tile line
         assert len(discarded) == 2
+        # Two positions should be newly placed
+        assert len(newly_placed) == 2
+        assert (0, 0) in newly_placed
+        assert (2, 2) in newly_placed
 
     def test_move_incomplete_lines_unchanged(self, board: PlayerBoard):
         # Partially fill a pattern line
         board.pattern_lines[2].tiles = [Tile(TileType.BLACK)]  # Capacity 3, only 1 tile
 
-        discarded = board.move_completed_lines_to_wall()
+        discarded, newly_placed = board.move_completed_lines_to_wall()
 
         # Nothing should change
         assert not any(any(row) for row in board.wall)
         assert len(board.pattern_lines[2].tiles) == 1
         assert len(discarded) == 0
+        assert len(newly_placed) == 0
 
     def test_calculate_tile_score_single_tile(self, board: PlayerBoard):
         # Place single tile
@@ -478,14 +489,14 @@ class TestPlayerBoard:
         assert score == 5
 
     def test_calculate_round_score_no_tiles(self, board: PlayerBoard):
-        score = board.calculate_round_score()
+        score = board.calculate_round_score([])  # No newly placed tiles
         assert score == 0
 
     def test_calculate_round_score_with_floor_penalties(self, board: PlayerBoard):
         # Add tiles to floor
         board.floor = [Tile(TileType.BLUE), Tile(TileType.RED)]
 
-        score = board.calculate_round_score()
+        score = board.calculate_round_score([])  # No newly placed tiles
         # First two floor tiles: -1, -1
         assert score == -2
 
@@ -493,9 +504,22 @@ class TestPlayerBoard:
         # Fill floor beyond penalty limit
         board.floor = [Tile(TileType.BLUE)] * 10
 
-        score = board.calculate_round_score()
+        score = board.calculate_round_score([])  # No newly placed tiles
         # Only first 7 tiles count: -1, -1, -2, -2, -2, -3, -3 = -14
         assert score == -14
+
+    def test_calculate_round_score_with_new_tiles(self, board: PlayerBoard):
+        # Place some tiles on wall to create adjacencies
+        board.wall[1][1] = True
+        board.wall[1][2] = True
+        
+        # Add floor penalties
+        board.floor = [Tile(TileType.BLUE)]
+        
+        # Score newly placed tile that has adjacency
+        score = board.calculate_round_score([(1, 0)])  # Place tile adjacent to existing ones
+        # Should get 3 points (1 for tile + 2 for adjacent) - 1 for floor penalty = 2
+        assert score == 2
 
     def test_clear_floor(self, board: PlayerBoard):
         # Add tiles to floor

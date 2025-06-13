@@ -2,8 +2,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 from enum import Enum
+from uuid import UUID
 
-from ..azul.data_model import Action, TileType, ActionType
+from ..azul.data_model import Action, TileType, ActionType, GameMode
 
 
 class SessionStatus(Enum):
@@ -34,14 +35,24 @@ class SessionMetadata:
 class CreateSessionRequest:
     """Request to create a new session"""
     num_players: int = 2
+    game_mode: str = "SELFPLAY"  # Will be converted to GameMode enum in the handler
+    player_name: Optional[str] = None
+    
+    def get_game_mode(self) -> GameMode:
+        """Convert string game_mode to GameMode enum"""
+        try:
+            return GameMode(self.game_mode)
+        except ValueError:
+            return GameMode.SELFPLAY
 
 
 @dataclass
 class CreateSessionResponse:
     """Response when creating a new session"""
-    session_id: str
+    session_id: str  # Convert UUID to string for JSON serialization
     game_state: dict
     message: str
+    player_id: Optional[str] = None  # For PVP mode, return the player ID
 
 
 @dataclass
@@ -104,6 +115,29 @@ class AbortSessionResponse:
 
 
 @dataclass
+class JoinSessionRequest:
+    """Request to join an existing session"""
+    player_name: Optional[str] = None
+
+
+@dataclass
+class JoinSessionResponse:
+    """Response when joining a session"""
+    session_id: str
+    player_id: str
+    player_index: int
+    game_state: dict
+    message: str
+
+
+@dataclass
+class LeaveSessionResponse:
+    """Response when leaving a session"""
+    session_id: str
+    message: str
+
+
+@dataclass
 class ErrorResponse:
     """Error response"""
     detail: str
@@ -132,7 +166,7 @@ class WebSocketAbortMessage(WebSocketMessage):
 class WebSocketStateUpdateMessage(WebSocketMessage):
     """WebSocket message for game state updates"""
     type: str = "game_state_update"
-    session_id: str = ""
+    session_id: UUID = UUID('00000000-0000-0000-0000-000000000000')
     game_state: dict = field(default_factory=dict)
 
 
@@ -140,7 +174,7 @@ class WebSocketStateUpdateMessage(WebSocketMessage):
 class WebSocketGameAbortedMessage(WebSocketMessage):
     """WebSocket message when game is aborted"""
     type: str = "game_aborted"
-    session_id: str = ""
+    session_id: UUID = UUID('00000000-0000-0000-0000-000000000000')
     game_state: dict = field(default_factory=dict)
 
 

@@ -16,6 +16,9 @@ export function PlayerBoard({ playerIndex }: PlayerBoardProps) {
     const selectPatternLine = useStore(state => state.selectPatternLine);
     const partialAction = useStore(state => state.partialAction);
     const currentPlayer = useStore(state => state.gameState.current_player);
+    const isActionValid = useStore(state => state.isActionValid);
+    const clearAction = useStore(state => state.clearAction);
+    const setError = useStore(state => state.setError);
     
     if (!playerState) {
         return <div className="player-board">Loading player...</div>;
@@ -50,9 +53,9 @@ export function PlayerBoard({ playerIndex }: PlayerBoardProps) {
 
     const handlePatternLineClick = (lineIndex: number) => {
         // Only allow pattern line selection for the current player
-        if (isCurrentPlayer) {
-            selectPatternLine(lineIndex);
-        }
+        if (!isCurrentPlayer) return;
+        
+        selectPatternLine(lineIndex);
     };
 
     const isCurrentPlayer = currentPlayer === playerIndex;
@@ -145,7 +148,12 @@ export function PlayerBoard({ playerIndex }: PlayerBoardProps) {
             </div>
 
             <div className="board-section floor-line">
-                <h3>Floor Line</h3>
+                <h3 
+                    className={`floor-line-header ${partialAction.patternLine === -1 && isCurrentPlayer ? 'selected' : ''} ${!isCurrentPlayer ? 'disabled' : ''}`}
+                    onClick={() => handlePatternLineClick(-1)}
+                >
+                    Floor Line (Click to Select)
+                </h3>
                 <div className="floor-tiles">
                     {Array.from({ length: 7 }).map((_, index) => {
                         const penalties = [-1, -1, -2, -2, -2, -3, -3];

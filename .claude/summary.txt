@@ -1,0 +1,161 @@
+# Azul Game Development Progress Summary
+
+## Project Overview
+We're developing an Azul board game with React/TypeScript frontend and Python FastAPI backend, supporting multiple game modes: SelfPlay, PvP, and PvAI.
+
+## Major Issues Fixed
+
+### 1. **Game Logic & Scoring Bug Fix**
+- **Problem**: Round scoring was broken - players got points for ALL tiles on wall every round, causing exponential score growth
+- **Solution**: Fixed `calculate_round_score()` to only score newly placed tiles each round
+- **Files Modified**: 
+  - `src/azul/components.py`: Updated `move_completed_lines_to_wall()` and `calculate_round_score()`
+  - `src/azul/game.py`: Updated `_end_round()` method
+  - `tests/unit/test_models.py`: Updated tests for new signatures
+
+### 2. **Action Validation System**
+- **Problem**: Invalid actions were being sent to backend (400 errors) instead of being prevented
+- **Solution**: Implemented frontend validation against `validActions` list
+- **Files Modified**:
+  - `viz/src/stores/GameStore.tsx`: Added `isActionValid()` method with case-insensitive tile type comparison
+  - `viz/src/components/PlayerBoard.tsx`: Added clickable floor line option (pattern_line: -1)
+  - Removed validation from selection process, kept only in `executeAction()`
+
+### 3. **Floor Line Accessibility**
+- **Problem**: Game deadlocks when no valid pattern line actions available
+- **Solution**: Made floor line clickable as fallback option
+- **Implementation**: Added clickable header "Floor Line (Click to Select)" with visual feedback
+
+## Backend Infrastructure Overhaul
+
+### 4. **Multiplayer Game Mode Support**
+- **New Enums**: `GameMode` (SELFPLAY, PVP, PVAI), `PlayerStatus` (CONNECTED, DISCONNECTED, LEFT)
+- **New Data Models**: `Player` class with UUID, name, status, player_index
+- **Updated GameState**: Added `game_mode`, `session_players`, `max_players` fields
+
+### 5. **Session Management Enhancement**
+- **New Endpoints**:
+  - `POST /sessions/{session_id}/join` - Join existing PVP session
+  - `POST /sessions/{session_id}/leave/{player_id}` - Leave session
+- **Updated**: `POST /sessions` now accepts `game_mode` and `player_name`
+- **Features**: Player tracking, session capacity management, game mode validation
+
+### 6. **Complete Backend Typing Revision**
+- **UUID Implementation**: All IDs use proper UUID types internally, strings for API boundary
+- **Type Annotations**: Complete function signatures with return types
+- **Enum Safety**: No string comparisons with enums, proper enum types throughout
+- **Generic Types**: `Dict[UUID, AzulGame]`, `List[Player]`, `Optional[UUID]`, etc.
+
+## Frontend Updates
+
+### 7. **GameStore Enhancements**
+- **New Methods**: `joinSession()`, `leaveSession()`, `startNewGame()` with game mode support
+- **New State**: `playerId` field for player tracking
+- **API Integration**: Handles UUID conversion, game mode selection
+
+### 8. **UI Improvements**
+- **PlayerBoard**: Added clickable floor line with selection states
+- **Validation**: Real-time action validation with error display
+- **Tile Selection**: Improved UX - no premature clearing of selections
+
+## Key Technical Decisions
+
+### 9. **Architecture Patterns**
+- **UUID-First**: Internal UUIDs converted to strings only at API boundary
+- **Enum-Safe**: No magic strings, all enums properly typed
+- **Validation Strategy**: Frontend prevents invalid actions, backend validates all inputs
+- **State Management**: Zustand store with proper TypeScript integration
+
+### 10. **Game Rule Compliance**
+- **Floor Line Overflow**: Backend handles overflow to discard pile automatically  
+- **Scoring**: Only newly placed tiles scored each round (proper Azul rules)
+- **Turn Management**: Fixed turn passing logic with enum-based state tracking
+
+## Current Status
+- ✅ Backend: Fully typed, multiplayer-ready, proper game logic
+- ✅ Frontend: Working game with validation and improved UX
+- ✅ Core Game: SelfPlay mode fully functional
+- 🚧 **Next**: Game mode selection UI, player status icons, QR code sharing for PvP
+
+## Files Structure
+```
+/src/azul/
+├── data_model.py       # Enums, Player, Action classes
+├── game_state.py       # GameState with multiplayer fields  
+├── components.py       # Fixed scoring logic
+├── game.py            # Updated round management
+└── /backend/
+    ├── session_manager.py  # UUID-typed session handling
+    ├── models.py          # Request/Response models
+    └── /routers/sessions.py # API endpoints with UUID conversion
+
+/viz/src/
+├── stores/GameStore.tsx    # Enhanced with multiplayer methods
+└── components/PlayerBoard.tsx # Floor line + validation
+```
+
+## Outstanding Items for Next Session
+1. **Frontend**: Game mode selection screen
+2. **Frontend**: Player status icons (connected/disconnected/left)  
+3. **Frontend**: QR code generation for session sharing
+4. **Testing**: Validate all multiplayer workflows
+5. **Polish**: Error handling, loading states, responsive design
+
+## Future Enhancement: Drag & Drop UX
+
+### **Vision**
+Replace the current click-select-execute flow with intuitive drag & drop:
+- **Current**: Click tile → Click pattern line → Click execute button
+- **Future**: Drag tile directly to pattern line → Action executes immediately
+
+### **Technical Feasibility**
+**Highly achievable** with existing architecture:
+- All validation logic (`isActionValid`) works perfectly as-is
+- Backend API requires no changes
+- Only UI interaction layer needs updating
+
+### **Recommended Libraries**
+- **@dnd-kit** (modern, accessible, TypeScript-first)
+- **react-dnd** (established, very flexible)
+- Native HTML5 drag & drop (simpler but less control)
+
+### **Implementation Strategy**
+```typescript
+// Draggable tile groups
+<TileGroup 
+  draggable 
+  onDragStart={() => setDraggedTile({type, factoryId})}
+/>
+
+// Drop zones (pattern lines + floor)
+<PatternLine
+  onDrop={(draggedTile) => {
+    if (isActionValid(draggedTile.type, draggedTile.factoryId, lineIndex)) {
+      executeAction(draggedTile.type, draggedTile.factoryId, lineIndex)
+    } else {
+      showError("Invalid placement")
+    }
+  }}
+/>
+```
+
+### **Challenges to Address**
+1. **Mobile/Touch**: Drag & drop challenging on mobile - need touch-specific handling
+2. **Visual Feedback**: Highlight valid/invalid drop zones during drag
+3. **Accessibility**: Provide keyboard alternatives for screen readers
+4. **Multi-tile Logic**: Dragging one tile but taking all tiles of that type from factory
+
+### **Phased Approach**
+1. **Phase 1**: Desktop drag & drop implementation
+2. **Phase 2**: Mobile-friendly touch gestures  
+3. **Phase 3**: Accessibility improvements
+
+### **Benefits**
+- **Intuitive**: Matches physical board game interaction
+- **Efficient**: Single gesture vs. 3 clicks
+- **Professional**: Modern game UX standard
+- **Engaging**: More satisfying user interaction
+
+**Priority**: Implement after core multiplayer features are complete. The existing validation system provides the perfect foundation for responsive drag & drop feedback.
+
+This foundation provides a solid multiplayer-ready game with proper typing and validation, ready for PvP and eventual PvAI implementation.

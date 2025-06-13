@@ -167,9 +167,10 @@ class PlayerBoard:
             if overflow > 0:
                 self.floor.extend(tiles[-overflow:])
 
-    def move_completed_lines_to_wall(self) -> List[Tile]:
-        # Returns tiles to be discarded
+    def move_completed_lines_to_wall(self) -> Tuple[List[Tile], List[Tuple[int, int]]]:
+        # Returns (tiles to be discarded, newly placed wall positions)
         discarded = []
+        newly_placed = []
 
         for i, pattern_line in enumerate(self.patternLines):
             if pattern_line.is_full():
@@ -180,22 +181,20 @@ class PlayerBoard:
 
                 # Place one tile on wall
                 self.wall[i][wall_col] = True
+                newly_placed.append((i, wall_col))
 
                 # Discard the rest
                 tiles = pattern_line.clear()
                 discarded.extend(tiles[1:])  # Keep one for wall, discard rest
 
-        return discarded
+        return discarded, newly_placed
 
-    def calculate_round_score(self) -> int:
+    def calculate_round_score(self, newly_placed_positions: List[Tuple[int, int]]) -> int:
         points = 0
 
-        # Score wall placements
-        for row in range(5):
-            for col in range(5):
-                if self.wall[row][col]:
-                    # Check if this was placed this round (simplified - in real game you'd track this)
-                    points += self._calculate_tile_score(row, col)
+        # Score only newly placed tiles this round
+        for row, col in newly_placed_positions:
+            points += self._calculate_tile_score(row, col)
 
         # Floor penalties
         floor_penalty = sum(

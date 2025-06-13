@@ -5,7 +5,7 @@ from typing import List, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from .data_model import Action
 
-from .data_model import GameStateType, CompletionStatus
+from .data_model import GameStateType, CompletionStatus, GameMode, Player
 from .components import Bag, Container, Factory, PlayerBoard
 
 
@@ -24,6 +24,10 @@ class GameState:
     completion: CompletionStatus = CompletionStatus.NOT_COMPLETED
     winner: int = -1
     valid_actions: List['Action'] = field(default_factory=list)
+    # New fields for multiplayer support
+    game_mode: GameMode = GameMode.SELFPLAY
+    session_players: List[Player] = field(default_factory=list)
+    max_players: int = 2
 
     def __post_init__(self):
         if not self.factories:
@@ -79,6 +83,12 @@ class GameState:
         """
         Custom JSON serializer for objects that aren't JSON serializable by default.
         """
+        from uuid import UUID
+        
+        # Handle UUIDs
+        if isinstance(obj, UUID):
+            return str(obj)
+        
         # Handle enums
         if hasattr(obj, "value"):
             return obj.value
